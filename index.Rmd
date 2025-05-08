@@ -50,7 +50,7 @@ data_pollen$specie <- forcats::fct_relevel(data_pollen$specie, sp)
 
 - Extending with non-parametric regression
 
-- Final remarks
+- Preliminary results and final remarks
 
 ---
 ## Motivating example
@@ -73,7 +73,7 @@ data_pollen |>
 
 <!-- - Experiment induced a compositional structure, and the observed data has many zeros. -->
 
-```{r plot-pollen, echo = FALSE, out.width="80%"}
+```{r plot-pollen, echo = FALSE, out.width="75%"}
 data_pollen |> 
   dplyr::filter(specie %in% sp[1:9]) |>
   ggplot(aes(x = mtco, y = prop)) +
@@ -84,8 +84,7 @@ data_pollen |>
   labs(y = "Empirical proportion", x = "Mean temperature of coldest month (MTCO)")
 ```
 
-- No zero-inflated versions of multinomial or Dirichlet-multinomial distributions
-available.
+- Data exhibit more zeros than expected under multinomial and Dirichlet-multinomial distributions, but there are no zero-inflated versions of these distributions available.
 
 
 ---
@@ -147,14 +146,15 @@ $\eta_{\mathcal{K}} = \prod_{k \in \mathcal{K}} \zeta_k\,\prod_{j \notin \mathca
 $$\begin{align}\Pr\lbrack 
 \mathbf{Y} = \mathbf{y}; \pmb{\theta}, \pmb{\zeta}\rbrack &= \eta_d\,\binom{N}{y_{1} \dots y_{d}}\, 
 \prod_{j=1}^d
-\theta_j^{y_{j}} \\
-&\phantom{=}~+\eta_0\,\prod_{j=1}^{d}\,I_0(y_j)\\
-&\phantom{=}~+
+\theta_j^{y_{j}} \leftarrow \fbox{Multinomial component}\\
+\fbox{All-inflation component}\rightarrow  &\phantom{=}~+\eta_0\,\prod_{j=1}^{d}\,I_0(y_j)\\
+\fbox{N-inflation components}\rightarrow &\phantom{=}~+
 \sum_{j=1}^{d}\,
 \eta_{N}^{(j)}
 \left\lbrack 
 I_0\left(\sum_{k\colon k \neq j} y_{k} \right)\,
 \right\rbrack \\
+\fbox{Reduced multinomials}\rightarrow 
 &\phantom{=}~+
 \sum_{\mathcal{K} \in \mathfrak{K}} 
 \eta_{\mathcal{K}}
@@ -163,14 +163,14 @@ I_0\left(\sum_{k \in \mathcal{K}} y_k\right)
 \binom{N}{\{y_j\}_{j \notin \mathcal{K}}} 
 \prod_{j \notin \mathcal{K}} \left( \theta_j^{\mathcal{K}} \right)^{y_j}
 \right\rbrack  
-\quad \mathrm{for} \quad \mathbf{y} \in \pmb{\Omega}_{d,N},\end{align}$$
+\quad \mathrm{for} \quad \mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d,\end{align}$$
 where 
 $\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}$.
 
 > We do not need to evaluate ALL $2^d$ mixture components.
 
 ---
-### Marginal p.m.f. $\pmb{\theta} = (0.05, 0.70, 0.25), \pmb{\zeta} = (0.05, 0.15, 0.10)$ and $N=30$
+### Marginal p.m.f. $\pmb{\theta} = (0.05, 0.70, 0.25), \pmb{\zeta} = (0.05, 0.15, 0.10)$, and $N=30$
 
 ```{r marginal-pmf,fig.width = 12, fig.height = 4}
 .dbetabinomial <- function(x, n, a, b, log = TRUE) {
@@ -237,8 +237,8 @@ data_pmf_dm <- dplyr::tibble(dist = "DM",
                                pmf = c(pmf_dm),
                                cat = rep(paste0("j == ", 1:d),
                                          each = length(xx)))
-data_pmf <- rbind(data_pmf_zanim, data_pmf_zanidm, data_pmf_mult,
-                  data_pmf_dm)
+data_pmf <- rbind(data_pmf_mult, data_pmf_dm,
+                  data_pmf_zanim, data_pmf_zanidm)
 
 mom <- lapply(1:d, function(j) {
   out <- rbind(
@@ -300,7 +300,7 @@ tab |>
 ```
 
 ---
-# Sthocastic representation
+# Stochastic representation
 
 If $\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N, \boldsymbol{\theta}, \boldsymbol{\zeta} \rbrack$,
 then $\mathbf{Y}$ has the stochastic representation:
@@ -368,7 +368,7 @@ $g(\mathbf{x}_i; \mathcal{T}, \mathcal{M}) = I(\mathbf{x}_i \in \mathcal{A}_{\el
 with $\mu_{\ell} \in \mathbb{R}$ for $\ell = 1\ldots, b$ terminal nodes of $\mathcal{T}$,
 and $\{A_{\ell}\}_{\ell=1}^b$ is a partition of the covariate space $\mathcal{X}$.
 
-- Bayesian inference is performed through MCMC algorithm
+- Bayesian inference is performed via MCMC following
 `r Citep(bib, c("Chipman2010", "Linero2020", "Murray2021"))`.
 
 ---
@@ -432,7 +432,7 @@ additive regression trees approach.
 
 --
 
-- Extend ZANIDM to allowed parameters dependent on covariates through non-parametric additive
+- Extend ZANIDM to also allow parameters to depend on covariates through non-parametric additive
 regression trees.
 
 - Consider other component distributions suitable for modelling count-compositional
