@@ -88,7 +88,7 @@ class: center, middle, inverse, title-slide
 
 
 ---
-# Zero-&amp;-N-inflated Multinomial distribution
+# Zero-&amp;-N-inflated multinomial distribution
 
 - Let `\(\mathbf{Y} = (Y_{1}, \ldots, Y_{d})\)` be a count-compositional random vector,
 whose sum `\(\sum_{j=1}^{d} Y_j = N\)` is constrained by a (known) integer `\(N\)`.
@@ -172,7 +172,7 @@ and then integrate out `\(\phi\)` to obtain the zero-&amp;-N-inflated multinomia
 \left\lbrack 
 I_0\left(\sum_{k\colon k \neq j} y_{k} \right)\,
 \right\rbrack \\
-\fbox{Reduced multinomials}\rightarrow 
+\fbox{Reduced multinomials components}\rightarrow 
 &amp;\phantom{=}~+
 \sum_{\mathcal{K} \in \mathfrak{K}} 
 \eta_{\mathcal{K}}
@@ -181,9 +181,12 @@ I_0\left(\sum_{k \in \mathcal{K}} y_k\right)
 \binom{N}{\{y_j\}_{j \notin \mathcal{K}}} 
 \prod_{j \notin \mathcal{K}} \left( \theta_j^{\mathcal{K}} \right)^{y_j}
 \right\rbrack  
-\quad \mathrm{for} \quad \mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d,\end{align}$$`
+\end{align}$$`
+for `\(\mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d\)`,
 where
-`\(\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}\)`.
+`\(\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}\)`,
+and 
+`\(\mathfrak{K} = \{\mathcal{K} \subseteq \{1,\ldots,d\}; 1 \leq \lvert\mathcal{K}\rvert \leq d-2\}\)`.
 
 --
 &gt; We do not need to evaluate ALL `\(2^d\)` mixture components and there are only `\(2d\)` parameters, as the mixture weights `\(\boldsymbol{\eta}\)` are simple functions of the `\(\boldsymbol{\zeta}\)` parameters.
@@ -439,7 +442,7 @@ based on pollen data ([Parnell et al., 2015](#bib-Parnell2015)).
 count: false
 # References
 
-.font70[
+.font65[
 &lt;a name=bib-Baker1994&gt;&lt;/a&gt;[Baker, S. G.](#cite-Baker1994) (1994). "The
 Multinomial-Poisson Transformation". In: _Journal of the Royal
 Statistical Society. Series D (The Statistician)_ 43.4, pp. 495-504.
@@ -491,6 +494,11 @@ Series C (Applied Statistics)_ 64.1, pp. 115-138.
 al.](#cite-SalterTownshend2012) (2012). "Fast inversion of a flexible
 regression model for multivariate pollen counts data". In:
 _Environmetrics_ 23, pp. 595-605.
+
+&lt;a name=bib-Tipton2019&gt;&lt;/a&gt;[Tipton, J. R. et al.](#cite-Tipton2019)
+(2019). "Predicting paleoclimate from compositional data using
+multivariate Gaussian process inverse prediction". In: _The Annals of
+Applied Statistics_ 13.4, pp. 2363-2388.
 ]
 
 

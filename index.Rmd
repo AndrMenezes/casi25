@@ -90,7 +90,7 @@ data_pollen |>
 
 
 ---
-# Zero-&-N-inflated Multinomial distribution
+# Zero-&-N-inflated multinomial distribution
 
 - Let $\mathbf{Y} = (Y_{1}, \ldots, Y_{d})$ be a count-compositional random vector,
 whose sum $\sum_{j=1}^{d} Y_j = N$ is constrained by a (known) integer $N$.
@@ -174,7 +174,7 @@ $$\begin{align}\Pr\lbrack
 \left\lbrack 
 I_0\left(\sum_{k\colon k \neq j} y_{k} \right)\,
 \right\rbrack \\
-\fbox{Reduced multinomials}\rightarrow 
+\fbox{Reduced multinomials components}\rightarrow 
 &\phantom{=}~+
 \sum_{\mathcal{K} \in \mathfrak{K}} 
 \eta_{\mathcal{K}}
@@ -183,9 +183,12 @@ I_0\left(\sum_{k \in \mathcal{K}} y_k\right)
 \binom{N}{\{y_j\}_{j \notin \mathcal{K}}} 
 \prod_{j \notin \mathcal{K}} \left( \theta_j^{\mathcal{K}} \right)^{y_j}
 \right\rbrack  
-\quad \mathrm{for} \quad \mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d,\end{align}$$
+\end{align}$$
+for $\mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d$,
 where
-$\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}$.
+$\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}$,
+and 
+$\mathfrak{K} = \{\mathcal{K} \subseteq \{1,\ldots,d\}; 1 \leq \lvert\mathcal{K}\rvert \leq d-2\}$.
 
 --
 > We do not need to evaluate ALL $2^d$ mixture components and there are only $2d$ parameters, as the mixture weights $\boldsymbol{\eta}$ are simple functions of the $\boldsymbol{\zeta}$ parameters.
@@ -520,9 +523,9 @@ based on pollen data `r Citep(bib, "Parnell2015")`.
 count: false
 # References
 
-.font70[
+.font65[
 ```{r bib, results='asis', echo=FALSE}
-RefManageR::PrintBibliography(bib, start = 1, end = 11)
+RefManageR::PrintBibliography(bib, start = 1, end = 12)
 ```
 ]
 
