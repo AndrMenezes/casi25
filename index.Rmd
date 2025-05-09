@@ -445,7 +445,7 @@ with $\mu_{\ell} \in \mathbb{R}$ for $\ell = 1\ldots, b$ terminal nodes of $\mat
 and $\{A_{\ell}\}_{\ell=1}^b$ is a partition of the covariate space $\mathcal{X}$.
 
 - Bayesian inference is performed via MCMC following
-`r Citep(bib, c("Chipman2010", "Linero2020", "Murray2021"))`.
+`r Citet(bib, c("Chipman2010", "Linero2020", "Murray2021"))`.
 
 ---
 # Preliminary results
