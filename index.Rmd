@@ -88,60 +88,77 @@ data_pollen |>
 
 
 ---
-# zero-&-N-inflated count-compositional distributions
+# Multinomial data augmentation
 
 - Let $\mathbf{Y} = (Y_{1}, \ldots, Y_{d})$ be a count-compositional random vector,
 whose sum $\sum_{j=1}^{d} Y_j = N$ is constrained by a (known) integer $N$.
 
---
-- Let $\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)$ be a vector of zero-inflation parameters for each category such that $\zeta_j \in \lbrack 0, 1 \rbrack$,
-for $j=1,\ldots,d$.
+- Let $\boldsymbol{\theta} = (\theta_1, \ldots, \theta_d)$, such that $\theta_j$ denotes the occurence probability of category $j$.
+
+<!-- -- -->
+<!-- - Let $\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)$ be a vector of zero-inflation parameters for each category such that $\zeta_j \in \lbrack 0, 1 \rbrack$. -->
+
+<!-- -- -->
+<!-- - Zero-&-N-inflated multinomial (ZANIM): $\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N,\boldsymbol{\theta}, \boldsymbol{\zeta}\rbrack$, where $\boldsymbol{\theta} = (\theta_1, \ldots, \theta_d)$, such that $\theta_j \geq 0$ and $\sum_{j=1}^d\,\theta_j=1$, denotes the probability of occurrence of category $j$. -->
+
 
 --
-- Zero-&-N-inflated Multinomial (ZANIM): $\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N,\boldsymbol{\theta}, \boldsymbol{\zeta}\rbrack$, where $\boldsymbol{\theta} = (\theta_1, \ldots, \theta_d)$, such that $\theta_j \geq 0$ and $\sum_{j=1}^d\,\theta_j=1$, denotes the probability of occurrence of category $j$.
+- Reparameterise $\theta_j=\lambda_j/\sum_{k=1}^d \lambda_k$ and introduce the latent variiable $(\phi \mid \boldsymbol{\lambda}, \mathbf{y}) \sim \operatorname{Gamma}\lbrack N, \sum_{j=1}^d\lambda_j\rbrack$, such that the augmented joint p.m.f is
+
+$$\Pr\lbrack\mathbf{Y}=\mathbf{y},\phi;\boldsymbol{\lambda}\rbrack=\dfrac{N!\phi^{N-1}}{\Gamma(N)}\prod_{j=1}^d\left\lbrack\dfrac{\lambda_j^{y_j}e^{-\lambda_j\phi}}{y_j!}\right\rbrack.$$
 
 --
-- Zero-&-N-inflated Dirichlet-Multinomial (ZANIDM): $\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N,\boldsymbol{\alpha}, \boldsymbol{\zeta}\rbrack$, where $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_d)$, such that $\alpha_j > 0$ are concentration parameters.
+- We extend this to a zero-inflated Poisson form with a vector $\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)$ of zero-inflation parameters for each category, such that $\zeta_j \in \lbrack 0, 1 \rbrack$, i.e.
+
+$$\Pr\lbrack \mathbf{Y} = \mathbf{y}, \phi; \boldsymbol{\lambda}, \boldsymbol{\zeta} \rbrack =
+\dfrac{N!\,\phi^{N - 1}}{\Gamma(N)}\,\prod_{j=1}^d \left\lbrack
+\zeta_j\,I_0(y_{j}) + (1 - \zeta_j)\,\dfrac{\lambda_j^{y_{j}}\,e^{-\lambda_j\,\phi}}{y_{j}!}
+\right\rbrack$$
+
+and then integrate out $\phi$ to obtain the zero-and-N-inflated multinomial (ZANIM) distribution.
+
+<!-- -- -->
+<!-- - Zero-&-N-inflated Dirichlet-Multinomial (ZANIDM): $\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N,\boldsymbol{\alpha}, \boldsymbol{\zeta}\rbrack$, where $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_d)$, such that $\alpha_j > 0$ are concentration parameters. -->
+
+<!-- --- -->
+<!-- # Finite mixture representation -->
+
+
+<!-- - We develop a new unifying framework that represents both as finite mixture distributions, -->
+<!-- _with $2^d$ components_. -->
+
+<!-- - We can write their probability mass function (p.m.f.) as: -->
+
+<!-- $$p(\mathbf{y}; \boldsymbol{\vartheta}, \boldsymbol{\zeta}) = \sum_{\ell=1}^{2^d} \eta_\ell\,p_\ell(y; \boldsymbol{\vartheta}_\ell)$$ -->
+<!-- where $\pmb{\vartheta}$ refers to $\pmb{\theta}$ or $\pmb{\alpha}$ under -->
+<!-- ZANIM and ZANIDM, respectively -->
+
+<!-- -- -->
+
+<!-- - _However_, both distributions have only $2d$ parameters: $\boldsymbol{\theta}$ or $\boldsymbol{\alpha}$,  -->
+<!-- and $\boldsymbol{\zeta}$. -->
+
+
+<!-- -- -->
+
+<!-- - _And_ the mixture weights $(\eta_\ell)$ are functions of $\pmb{\zeta}$: -->
+<!-- .font80[ -->
+<!-- .pull-left[ -->
+<!-- - $\eta_d = \prod_{j=1}^d\,(1-\zeta_j)$  -->
+<!-- - $\eta_0 = \prod_{j=1}^d\,\zeta_j$ -->
+<!-- ] -->
+<!-- .pull-right[ -->
+<!-- - $\eta_N^{(j)} = (1 - \zeta_{j})\,\prod_{k \colon k \neq j} \zeta_{k}$, for $j = 1\ldots, d$. -->
+<!-- - Define  -->
+<!-- $\mathfrak{K} = \{\mathcal{K} \subseteq \{1,\ldots,d\}; 1 \leq \lvert\mathcal{K}\rvert \leq d-2\}$, -->
+<!-- then for each $\mathcal{K} \in \mathfrak{K}$, we have -->
+<!-- $\eta_{\mathcal{K}} = \prod_{k \in \mathcal{K}} \zeta_k\,\prod_{j \notin \mathcal{K}} (1 - \zeta_j)$. -->
+<!-- ] -->
+
+<!-- ] -->
 
 ---
-# Finite mixture representation
-
-
-- We develop a new unifying framework that represents both as finite mixture distributions,
-_with $2^d$ components_.
-
-- We can write their probability mass function (p.m.f.) as:
-
-$$p(\mathbf{y}; \boldsymbol{\vartheta}, \boldsymbol{\zeta}) = \sum_{\ell=1}^{2^d} \eta_\ell\,p_\ell(y; \boldsymbol{\vartheta}_\ell)$$
-where $\pmb{\vartheta}$ refers to $\pmb{\theta}$ or $\pmb{\alpha}$ under
-ZANIM and ZANIDM, respectively
-
---
-
-- _However_, both distributions have only $2d$ parameters: $\boldsymbol{\theta}$ or $\boldsymbol{\alpha}$,
-and $\boldsymbol{\zeta}$.
-
-
---
-
-- _And_ the mixture weights $(\eta_\ell)$ are functions of $\pmb{\zeta}$:
-.font80[
-.pull-left[
-- $\eta_d = \prod_{j=1}^d\,(1-\zeta_j)$
-- $\eta_0 = \prod_{j=1}^d\,\zeta_j$
-]
-.pull-right[
-- $\eta_N^{(j)} = (1 - \zeta_{j})\,\prod_{k \colon k \neq j} \zeta_{k}$, for $j = 1\ldots, d$.
-- Define
-$\mathfrak{K} = \{\mathcal{K} \subseteq \{1,\ldots,d\}; 1 \leq \lvert\mathcal{K}\rvert \leq d-2\}$,
-then for each $\mathcal{K} \in \mathfrak{K}$, we have
-$\eta_{\mathcal{K}} = \prod_{k \in \mathcal{K}} \zeta_k\,\prod_{j \notin \mathcal{K}} (1 - \zeta_j)$.
-]
-
-]
-
----
-# ZANIM's p.m.f.
+# ZANIM finite mixture p.m.f.
 
 $$\begin{align}\Pr\lbrack
 \mathbf{Y} = \mathbf{y}; \pmb{\theta}, \pmb{\zeta}\rbrack &= \eta_d\,\binom{N}{y_{1} \dots y_{d}}\,
@@ -151,26 +168,58 @@ $$\begin{align}\Pr\lbrack
 \fbox{N-inflation components}\rightarrow &\phantom{=}~+
 \sum_{j=1}^{d}\,
 \eta_{N}^{(j)}
-\left\lbrack
+\left\lbrack 
 I_0\left(\sum_{k\colon k \neq j} y_{k} \right)\,
 \right\rbrack \\
-\fbox{Reduced multinomials}\rightarrow
+\fbox{Reduced multinomials}\rightarrow 
 &\phantom{=}~+
-\sum_{\mathcal{K} \in \mathfrak{K}}
+\sum_{\mathcal{K} \in \mathfrak{K}} 
 \eta_{\mathcal{K}}
 \left\lbrack
-I_0\left(\sum_{k \in \mathcal{K}} y_k\right)
-\binom{N}{\{y_j\}_{j \notin \mathcal{K}}}
+I_0\left(\sum_{k \in \mathcal{K}} y_k\right) 
+\binom{N}{\{y_j\}_{j \notin \mathcal{K}}} 
 \prod_{j \notin \mathcal{K}} \left( \theta_j^{\mathcal{K}} \right)^{y_j}
 \right\rbrack  
 \quad \mathrm{for} \quad \mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d,\end{align}$$
 where
 $\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}$.
 
-> We do not need to evaluate ALL $2^d$ mixture components.
+--
+> We do not need to evaluate ALL $2^d$ mixture components and there are only $2d$ parameters, as the mixture weights $\boldsymbol{\eta}$ are simple functions of the $\boldsymbol{\zeta}$ parameters.
 
 ---
-### Marginal p.m.f. $\pmb{\theta} = (0.05, 0.70, 0.25), \pmb{\zeta} = (0.05, 0.15, 0.10)$, and $N=30$
+# Stochastic representation
+
+If $\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N, \boldsymbol{\theta}, \boldsymbol{\zeta} \rbrack$,
+then $\mathbf{Y}$ has the stochastic representation:
+$$\begin{align*}
+(z_j \mid \zeta_{j}) &\sim \operatorname{Bernoulli}\lbrack 1 - \zeta_j \rbrack, \quad j=1,\ldots, d\\
+(\mathbf{Y} \mid N, \boldsymbol{\theta}, \boldsymbol{z}) &\sim
+\begin{cases} \delta_{\mathbf{0}_d}(\cdot) & \textrm{if} \: z_{j} = 0 \: \forall j\\
+\operatorname{Multinomial}_d\left\lbrack N, z_1\dfrac{\theta_1}{1 - s}, \ldots, z_d\dfrac{\theta_d}{1 - s}\right\rbrack
+& \textrm{otherwise},
+\end{cases}
+\end{align*}$$
+where $s=\sum_{k=1}^d (1 - z_k)\theta_k$.
+
+
+--
+If $\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N, \boldsymbol{\alpha}, \boldsymbol{\zeta} \rbrack$,
+then $\mathbf{Y}$ has the stochastic representation `r Citep(bib, "Koslovsky2023")`:
+$$\begin{align*}
+(z_{j} \mid \zeta_{j}) & \sim \operatorname{Bernoulli}\lbrack 1 - \zeta_{j}\rbrack, \\
+(\lambda_{j} \mid z_{j}, \alpha_{j}) &\sim (1 - z_{j})\,\delta_0(\cdot) + z_{j} \operatorname{Gamma}\lbrack \alpha_{j}, 1\rbrack, \quad j = 1,\ldots, d, \\
+(\mathbf{Y} \mid N, \boldsymbol{\lambda}, \boldsymbol{z}) &\sim
+\begin{cases} \delta_{\mathbf{0}_d}(\cdot) & \textrm{if} \: z_{j} = 0 \: \forall j\\
+\operatorname{Multinomial}_d\left\lbrack N, \frac{\lambda_{1}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}, \ldots, \frac{\lambda_{d}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}\right\rbrack
+& \textrm{otherwise}.
+\end{cases}\end{align*}$$
+
+--
+> We show that ZANIDM also admits a finite mixture representation and we derive moments, marginals, and fully conjugate Bayesian inference schemes for both distributions.
+
+---
+### Marginal p.m.f. $\pmb{\theta} = (0.05, 0.70, 0.25)$, $\pmb{\zeta} = (0.05, 0.15, 0.10)$, and $N=30$
 
 ```{r marginal-pmf, fig.width = 12, fig.height = 4}
 .dbetabinomial <- function(x, n, a, b, log = TRUE) {
@@ -238,7 +287,7 @@ data_pmf_dm <- dplyr::tibble(dist = "DM",
                                cat = rep(paste0("j == ", 1:d),
                                          each = length(xx)))
 data_pmf <- rbind(data_pmf_mult, data_pmf_dm,
-                  data_pmf_zanim, data_pmf_zanidm)
+                  data_pmf_zanidm, data_pmf_zanim)
 
 mom <- lapply(1:d, function(j) {
   out <- rbind(
@@ -310,33 +359,37 @@ tab |>
 ```
 
 ---
-# Stochastic representation
+### Marginal p.m.f. $\pmb{\zeta} = (0.05, 0.15, 0.10)$, $N=30$, $\pmb{\alpha}=c(1, 14, 5)$ [ZANIDM], $\pmb{\theta} = (0.05, 0.70, 0.25)$ [ZANIM]
 
-If $\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N, \boldsymbol{\theta}, \boldsymbol{\zeta} \rbrack$,
-then $\mathbf{Y}$ has the stochastic representation:
-$$\begin{align*}
-(z_j \mid \zeta_{j}) &\sim \operatorname{Bernoulli}\lbrack 1 - \zeta_j \rbrack, \quad j=1,\ldots, d\\
-(\mathbf{Y} \mid N, \boldsymbol{\theta}, \boldsymbol{z}) &\sim
-\begin{cases} \delta_{\mathbf{0}_d}(\cdot) & \textrm{if} \: z_{j} = 0 \: \forall j\\
-\operatorname{Multinomial}_d\left\lbrack N, z_1\dfrac{\theta_1}{1 - s}, \ldots, z_d\dfrac{\theta_d}{1 - s}\right\rbrack
-& \textrm{otherwise},
-\end{cases}
-\end{align*}$$
-where $s=\sum_{k=1}^d (1 - z_k)\theta_k$.
-
+```{r marginal-pmf2,fig.width = 12, fig.height = 4}
+p2 <- ggplot(data = dplyr::filter(data_pmf, dist %in% c("ZANIM", "ZANIDM")),
+             aes(x = x, y = pmf, col = dist)) +
+  facet_wrap(~cat, nrow = 1L, scales = "free", labeller = label_parsed) +
+  geom_pointrange(mapping = aes(ymin = 0, ymax = pmf),
+                  size = 0.12, fill = 0.2) +
+  scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+  labs(x = "k", y = latex2exp::TeX(r'($\Pr\lbrack Y_j = k \rbrack$)'),
+       col = "") +
+  colorspace::scale_color_discrete_qualitative()
+p2
+```
 
 --
-If $\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N, \boldsymbol{\alpha}, \boldsymbol{\zeta} \rbrack$,
-then $\mathbf{Y}$ has the stochastic representation `r Citep(bib, "Koslovsky2023")`:
-$$\begin{align*}
-(z_{j} \mid \zeta_{j}) & \sim \operatorname{Bernoulli}\lbrack 1 - \zeta_{j}\rbrack, \\
-(\lambda_{j} \mid z_{j}, \alpha_{j}) &\sim (1 - z_{j})\,\delta_0(\cdot) + z_{j} \operatorname{Gamma}\lbrack \alpha_{j}, 1\rbrack, \quad j = 1,\ldots, d, \\
-(\mathbf{Y} \mid N, \boldsymbol{\lambda}, \boldsymbol{z}) &\sim
-\begin{cases} \delta_{\mathbf{0}_d}(\cdot) & \textrm{if} \: z_{j} = 0 \: \forall j\\
-\operatorname{Multinomial}_d\left\lbrack N, \frac{\lambda_{1}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}, \ldots, \frac{\lambda_{d}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}\right\rbrack
-& \textrm{otherwise},
-\end{cases}\end{align*}$$
 
+```{r tab-moments2}
+tab <- teo_moments |> 
+  dplyr::filter(dist != "Multinomial") |> 
+  dplyr::arrange(j) |> 
+  dplyr::select(-c(prob0, cat))
+colnames(tab) <- c(
+  "Distribution", "j", "$\\mathbb{E}\\lbrack Y_j\\rbrack$",
+  "$\\mathrm{Var}\\lbrack Y_j \\rbrack$", "$\\mathrm{DI}\\lbrack Y_j \\rbrack$",
+  "$\\mathrm{ZI}\\lbrack Y_j \\rbrack$")
+tab |> 
+  kableExtra::kbl(caption = "Theoretical moments.", digits = 3, escape = FALSE) |> 
+  kableExtra::kable_classic(full_width = FALSE, html_font = "Palatino",
+                            font_size = 14)
+```
 
 ---
 # Menezes, Parnell, and Murphy (2025)
@@ -454,9 +507,9 @@ data, e.g., the Conway-Maxwell-multinomial distribution `r Cite(bib, c("Kadane20
 count: false
 # References
 
-.font80[
+.font70[
 ```{r bib, results='asis', echo=FALSE}
-RefManageR::PrintBibliography(bib, start = 1, end = 9)
+RefManageR::PrintBibliography(bib, start = 1, end = 11)
 ```
 ]
 
