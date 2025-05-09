@@ -109,7 +109,7 @@ To specify the margin of the first title h1
 
 /* Change default inverse background colour */
 .inverse {
-    background-color: #e64626; /* #0148A4; */
+    background-color: #F5F6FA;
     text-shadow: 0 0 20px #333;
 }
 .inverse .remark-slide-number {

@@ -1,6 +1,6 @@
 ---
 title: "Finite mixture representations of zero-&-N-inflated distributions for count-compositional data"
-author: 
+author:
   - "<strong>André F. B. Menezes<strong> -- MU"
   - Prof. Andrew Parnell -- UCD
   - Dr. Keefe Murphy -- MU
@@ -61,8 +61,8 @@ data_pollen$specie <- forcats::fct_relevel(data_pollen$specie, sp)
 data_pollen |>
   # dplyr::filter(id < 4) |>
   dplyr::select(-c(category, prop)) |>
-  dplyr::mutate(total = as.integer(total)) |> 
-  tidyr::pivot_wider(names_from = specie, values_from = total) |> 
+  dplyr::mutate(total = as.integer(total)) |>
+  tidyr::pivot_wider(names_from = specie, values_from = total) |>
   dplyr::select(gdd5, mtco, aet.pet, dplyr::all_of(sp))
 #    |>
 #   dplyr::glimpse()
@@ -74,13 +74,13 @@ data_pollen |>
 <!-- - Experiment induced a compositional structure, and the observed data has many zeros. -->
 
 ```{r plot-pollen, echo = FALSE, out.width="75%"}
-data_pollen |> 
+data_pollen |>
   dplyr::filter(specie %in% sp[1:9]) |>
   ggplot(aes(x = mtco, y = prop)) +
   facet_wrap(~specie) +
-  geom_point(alpha = 0.5, size = 0.8) +
+  geom_point(alpha = 0.3, size = 0.8) +
   geom_rug(data = dplyr::filter(data_pollen, specie %in% sp[1:9], total == 0),
-           aes(y = NA_real_), col = "red") +
+           aes(y = NA_real_), col = "red", alpha = 0.5) +
   labs(y = "Empirical proportion", x = "Mean temperature of coldest month (MTCO)")
 ```
 
@@ -118,7 +118,7 @@ ZANIM and ZANIDM, respectively
 
 --
 
-- _However_, both distributions have only $2d$ parameters: $\boldsymbol{\theta}$ or $\boldsymbol{\alpha}$, 
+- _However_, both distributions have only $2d$ parameters: $\boldsymbol{\theta}$ or $\boldsymbol{\alpha}$,
 and $\boldsymbol{\zeta}$.
 
 
@@ -127,12 +127,12 @@ and $\boldsymbol{\zeta}$.
 - _And_ the mixture weights $(\eta_\ell)$ are functions of $\pmb{\zeta}$:
 .font80[
 .pull-left[
-- $\eta_d = \prod_{j=1}^d\,(1-\zeta_j)$ 
+- $\eta_d = \prod_{j=1}^d\,(1-\zeta_j)$
 - $\eta_0 = \prod_{j=1}^d\,\zeta_j$
 ]
 .pull-right[
 - $\eta_N^{(j)} = (1 - \zeta_{j})\,\prod_{k \colon k \neq j} \zeta_{k}$, for $j = 1\ldots, d$.
-- Define 
+- Define
 $\mathfrak{K} = \{\mathcal{K} \subseteq \{1,\ldots,d\}; 1 \leq \lvert\mathcal{K}\rvert \leq d-2\}$,
 then for each $\mathcal{K} \in \mathfrak{K}$, we have
 $\eta_{\mathcal{K}} = \prod_{k \in \mathcal{K}} \zeta_k\,\prod_{j \notin \mathcal{K}} (1 - \zeta_j)$.
@@ -143,28 +143,28 @@ $\eta_{\mathcal{K}} = \prod_{k \in \mathcal{K}} \zeta_k\,\prod_{j \notin \mathca
 ---
 # ZANIM's p.m.f.
 
-$$\begin{align}\Pr\lbrack 
-\mathbf{Y} = \mathbf{y}; \pmb{\theta}, \pmb{\zeta}\rbrack &= \eta_d\,\binom{N}{y_{1} \dots y_{d}}\, 
+$$\begin{align}\Pr\lbrack
+\mathbf{Y} = \mathbf{y}; \pmb{\theta}, \pmb{\zeta}\rbrack &= \eta_d\,\binom{N}{y_{1} \dots y_{d}}\,
 \prod_{j=1}^d
 \theta_j^{y_{j}} \leftarrow \fbox{Multinomial component}\\
 \fbox{All-inflation component}\rightarrow  &\phantom{=}~+\eta_0\,\prod_{j=1}^{d}\,I_0(y_j)\\
 \fbox{N-inflation components}\rightarrow &\phantom{=}~+
 \sum_{j=1}^{d}\,
 \eta_{N}^{(j)}
-\left\lbrack 
+\left\lbrack
 I_0\left(\sum_{k\colon k \neq j} y_{k} \right)\,
 \right\rbrack \\
-\fbox{Reduced multinomials}\rightarrow 
+\fbox{Reduced multinomials}\rightarrow
 &\phantom{=}~+
-\sum_{\mathcal{K} \in \mathfrak{K}} 
+\sum_{\mathcal{K} \in \mathfrak{K}}
 \eta_{\mathcal{K}}
 \left\lbrack
-I_0\left(\sum_{k \in \mathcal{K}} y_k\right) 
-\binom{N}{\{y_j\}_{j \notin \mathcal{K}}} 
+I_0\left(\sum_{k \in \mathcal{K}} y_k\right)
+\binom{N}{\{y_j\}_{j \notin \mathcal{K}}}
 \prod_{j \notin \mathcal{K}} \left( \theta_j^{\mathcal{K}} \right)^{y_j}
 \right\rbrack  
 \quad \mathrm{for} \quad \mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d,\end{align}$$
-where 
+where
 $\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}$.
 
 > We do not need to evaluate ALL $2^d$ mixture components.
@@ -172,7 +172,7 @@ $\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\the
 ---
 ### Marginal p.m.f. $\pmb{\theta} = (0.05, 0.70, 0.25), \pmb{\zeta} = (0.05, 0.15, 0.10)$, and $N=30$
 
-```{r marginal-pmf,fig.width = 12, fig.height = 4}
+```{r marginal-pmf, fig.width = 12, fig.height = 4}
 .dbetabinomial <- function(x, n, a, b, log = TRUE) {
   out <- lchoose(n, x) + lbeta(x + a, n - x + b) - lbeta(a, b)
   if (log) return(out) else return(exp(out))
@@ -191,7 +191,7 @@ pmf_mult <- matrix(data = 0L, nrow = length(xx), ncol = d)
 pmf_dm <- matrix(data = 0L, nrow = length(xx), ncol = d)
 
 for (i in seq_along(xx)) {
-  pmf_zanim[i, 1L] <- zanim::dzanim_marginal(x = xx[i], size = m, prob = theta, 
+  pmf_zanim[i, 1L] <- zanim::dzanim_marginal(x = xx[i], size = m, prob = theta,
                                       zeta = zeta, j = 1L)
   pmf_zanim[i, 2L] <- zanim::dzanim_marginal(x = xx[i], size = m, prob = theta,
                                       zeta = zeta, j = 2L)
@@ -245,7 +245,7 @@ mom <- lapply(1:d, function(j) {
     do.call(cbind, zanim::moments_zanim(size = m, prob = theta, zeta = zeta, j = j)),
     do.call(cbind, zanim::moments_zanidm(size = m, alpha = alpha, zeta = zeta, j = j))
   )
-  cbind(dist = c("ZANIM", "ZANIDM"), j = j, 
+  cbind(dist = c("ZANIM", "ZANIDM"), j = j,
         prob0 = c(zanim::dzanim_marginal(x = 0, size = m, prob = theta,
                                   zeta = zeta, log = TRUE, j = j),
                   zanim::dzanidm_marginal(x = 0, size = m, alpha = alpha,
@@ -270,8 +270,7 @@ teo_moments$di <- teo_moments$var / teo_moments$mean
 teo_moments$zi <- 1 + teo_moments$prob0 / teo_moments$mean
 teo_moments$cat <- paste0("j == ", teo_moments$j)
 
-
-ggplot(data = dplyr::filter(data_pmf, dist %in% c("ZANIM", "Multinomial")),
+p1 <- ggplot(data = dplyr::filter(data_pmf, dist %in% c("ZANIM", "Multinomial")),
             aes(x = x, y = pmf, col = dist)) +
   facet_wrap(~cat, nrow = 1L, scales = "free", labeller = label_parsed) +
   geom_pointrange(mapping = aes(ymin = 0, ymax = pmf),
@@ -280,21 +279,32 @@ ggplot(data = dplyr::filter(data_pmf, dist %in% c("ZANIM", "Multinomial")),
   labs(x = "k", y = latex2exp::TeX(r'($\Pr\lbrack Y_j = k \rbrack$)'),
        col = "") +
   colorspace::scale_color_discrete_qualitative()
+p1
+# p2 <- ggplot(data = dplyr::filter(data_pmf, dist %in% c("ZANIDM", "DM")),
+#             aes(x = x, y = pmf, col = dist)) +
+#   facet_wrap(~cat, nrow = 1L, scales = "free", labeller = label_parsed) +
+#   geom_pointrange(mapping = aes(ymin = 0, ymax = pmf),
+#                   size = 0.12, fill = 0.2) +
+#   scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+#   labs(x = "k", y = latex2exp::TeX(r'($\Pr\lbrack Y_j = k \rbrack$)'),
+#        col = "") +
+#   colorspace::scale_color_discrete_qualitative()
+# plot_grid(p1, p2, ncol = 1)
 ```
 
 --
 
 ```{r tab-moments}
-tab <- teo_moments |> 
-  dplyr::filter(dist != "ZANIDM") |> 
-  dplyr::arrange(j) |> 
+tab <- teo_moments |>
+  dplyr::filter(dist != "ZANIDM") |>
+  dplyr::arrange(j) |>
   dplyr::select(-c(prob0, cat))
 colnames(tab) <- c(
   "Distribution", "j", "$\\mathbb{E}\\lbrack Y_j\\rbrack$",
   "$\\mathrm{Var}\\lbrack Y_j \\rbrack$", "$\\mathrm{DI}\\lbrack Y_j \\rbrack$",
   "$\\mathrm{ZI}\\lbrack Y_j \\rbrack$")
-tab |> 
-  kableExtra::kbl(caption = "Theoretical moments.", digits = 3, escape = FALSE) |> 
+tab |>
+  kableExtra::kbl(caption = "Theoretical moments.", digits = 3, escape = FALSE) |>
   kableExtra::kable_classic(full_width = FALSE, html_font = "Palatino",
                             font_size = 14)
 ```
@@ -359,7 +369,7 @@ $$\begin{align}(\mathbf{Y}_{i} \mid \mathbf{x}_i, \mathcal{T}^{\pmb{\theta}}, \m
 \sim \operatorname{ZANIM}\lbrack N_i; \pmb{\theta}_i, \pmb{\zeta}_i\rbrack\\
 h_1(\theta_{ij}) &=
 \sum_{t=1}^{m_{\pmb{\theta}}} g(\mathbf{x}_i; \mathcal{T}^{(\theta_j)}_{t}, \mathcal{M}^{(\theta_j)}_{t}), \quad j = 1,\ldots, d,\\
-h_2(\zeta_{ij}) &= 
+h_2(\zeta_{ij}) &=
 \sum_{t=1}^{m_{\pmb{\zeta}}} g(\mathbf{x}_i; \mathcal{T}^{(\zeta_j)}_{t}, \mathcal{M}^{(\zeta_j)}_{t}),
 \quad j = 1,\ldots, d.\end{align}$$
 
@@ -383,7 +393,7 @@ chosen_species <- c("Pinus.D", "Artemisia")
 # Filtering
 d_theta <- dplyr::filter(d_theta, specie %in% chosen_species)
 d_zeta <- dplyr::filter(d_zeta, specie %in% chosen_species)
-data_pollen <- dplyr::filter(data_pollen, specie %in% chosen_species) |> 
+data_pollen <- dplyr::filter(data_pollen, specie %in% chosen_species) |>
   dplyr::mutate(is_zero = total == 0)
 # Plotting
 list_plots <- vector(mode = "list", length = length(chosen_species))
@@ -452,13 +462,17 @@ RefManageR::PrintBibliography(bib, start = 1, end = 9)
 
 
 ---
-class: center, middle
-
+class: middle, inverse
 # Thank you!
 
 .pull-left[.pull-down[
+
 <a href="mailto:andrefelipemaringa@gmail.com">
 `r icons::fontawesome("paper-plane")` andrefelipemaringa@gmail.com
+</a>
+
+<a href="https://andrmenezes.github.io/casi25">
+`r icons::fontawesome("link")` andrmenezes.github.io/casi25
 </a>
 
 <a href="http://github.com/AndrMenezes">
@@ -469,7 +483,6 @@ class: center, middle
 ]]
 
 .pull-right[
-```{r qrcode-2}
-knitr::include_graphics("./figures/qrcode.svg")
-```
+![Map](./figures/qrcode.svg)
 ]
+

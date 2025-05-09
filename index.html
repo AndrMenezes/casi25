@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Finite mixture representations of zero-&amp;-N-inflated distributions for count-compositional data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="André F. B. Menezes – MU" />
+    <meta name="author" content="Prof. Andrew Parnell – UCD" />
+    <meta name="author" content="Dr. Keefe Murphy – MU" />
+    <script src="index_files/header-attrs-2.29/header-attrs.js"></script>
+    <link href="index_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="index_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="index_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="config/sydney.css" type="text/css" />
+    <link rel="stylesheet" href="config/sydney-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Finite mixture representations of zero-&amp;-N-inflated distributions for count-compositional data
+]
+.author[
+### <strong>André F. B. Menezes<strong> – MU
+]
+.author[
+### Prof. Andrew Parnell – UCD
+]
+.author[
+### Dr. Keefe Murphy – MU
+]
+.date[
+### CASI, May 13, 2025
+]
+
+---
+
+
+
+
+# Outline
+
+- Motivating example
+
+- Zero-&amp;-N-inflated count-compositional distributions
+
+- Extending with non-parametric regression
+
+- Preliminary results and final remarks
+
+---
+## Motivating example
+
+- Paleoclimate modelling (pollen counts): &lt;a name=cite-Haslett2006&gt;&lt;/a&gt;&lt;a name=cite-SalterTownshend2012&gt;&lt;/a&gt;&lt;a name=cite-Parnell2015&gt;&lt;/a&gt;&lt;a name=cite-Ilvonen2016&gt;&lt;/a&gt;&lt;a name=cite-Tipton2019&gt;&lt;/a&gt;[Haslett et al. (2006)](#bib-Haslett2006); [Salter-Townshend et al. (2012)](#bib-SalterTownshend2012); [Parnell et al. (2015)](#bib-Parnell2015); [Ilvonen et al. (2016)](#bib-Ilvonen2016); [Tipton et al. (2019)](#bib-Tipton2019): 3 covariates and `\(d=28\)` categories.
+
+
+```
+## # A tibble: 7,832 × 31
+##     gdd5  mtco aet.pet Pinus.D Betula Gramineae Picea Quercus.D Alnus Cyperaceae
+##    &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt;     &lt;int&gt; &lt;int&gt;     &lt;int&gt; &lt;int&gt;      &lt;int&gt;
+##  1  1874  -7.9   0.893     721    158         0     7        22    50          0
+##  2  1623  -5.5   0.941     537     28         0   302        19    38          0
+##  3  1475  -4.7   0.931     136    183         0   110         0   276          0
+##  4  1360  -8.8   0.949     364    354         0   141         0   111          0
+##  5  1295  -6.9   0.993     708     50         0   151         0    91          0
+##  6  1539  -7.8   0.963     673    194         0    82         0    51          0
+##  7  1526  -6.6   0.949     281    280         0    93        47   187          0
+##  8  1553  -8.1   0.962     666    115         0   146         0    73          0
+##  9  1459 -10.9   0.95      420    267         0   143         0    45          0
+## 10  1283  -8.3   0.961     779     90         0   121         0    10          0
+## # ℹ 7,822 more rows
+## # ℹ 21 more variables: Chenopodiaceae &lt;int&gt;, Artemisia &lt;int&gt;, Quercus.E &lt;int&gt;,
+## #   Salix &lt;int&gt;, Juniperus &lt;int&gt;, Ericales &lt;int&gt;, Fagus &lt;int&gt;, Abies &lt;int&gt;,
+## #   Olea &lt;int&gt;, Ulmus &lt;int&gt;, Corylus &lt;int&gt;, Ostrya &lt;int&gt;, Pinus.H &lt;int&gt;,
+## #   Cedrus &lt;int&gt;, Carpinus &lt;int&gt;, Pistacia &lt;int&gt;, Castanea &lt;int&gt;, Larix &lt;int&gt;,
+## #   Tilia &lt;int&gt;, Ephedra &lt;int&gt;, Phillyrea &lt;int&gt;
+```
+
+---
+## Motivating example
+
+&lt;!-- - Experiment induced a compositional structure, and the observed data has many zeros. --&gt;
+
+&lt;img src="index_files/figure-html/plot-pollen-1.svg" width="75%" style="display: block; margin: auto;" /&gt;
+
+- Data exhibit more zeros than expected under multinomial and Dirichlet-multinomial distributions, but there are no zero-inflated versions of these distributions available.
+
+
+---
+# zero-&amp;-N-inflated count-compositional distributions
+
+- Let `\(\mathbf{Y} = (Y_{1}, \ldots, Y_{d})\)` be a count-compositional random vector,
+whose sum `\(\sum_{j=1}^{d} Y_j = N\)` is constrained by a (known) integer `\(N\)`.
+
+--
+- Let `\(\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)\)` be a vector of zero-inflation parameters for each category such that `\(\zeta_j \in \lbrack 0, 1 \rbrack\)`,
+for `\(j=1,\ldots,d\)`.
+
+--
+- Zero-&amp;-N-inflated Multinomial (ZANIM): `\(\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N,\boldsymbol{\theta}, \boldsymbol{\zeta}\rbrack\)`, where `\(\boldsymbol{\theta} = (\theta_1, \ldots, \theta_d)\)`, such that `\(\theta_j \geq 0\)` and `\(\sum_{j=1}^d\,\theta_j=1\)`, denotes the probability of occurrence of category `\(j\)`.
+
+--
+- Zero-&amp;-N-inflated Dirichlet-Multinomial (ZANIDM): `\(\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N,\boldsymbol{\alpha}, \boldsymbol{\zeta}\rbrack\)`, where `\(\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_d)\)`, such that `\(\alpha_j &gt; 0\)` are concentration parameters.
+
+---
+# Finite mixture representation
+
+
+- We develop a new unifying framework that represents both as finite mixture distributions,
+_with `\(2^d\)` components_.
+
+- We can write their probability mass function (p.m.f.) as:
+
+`$$p(\mathbf{y}; \boldsymbol{\vartheta}, \boldsymbol{\zeta}) = \sum_{\ell=1}^{2^d} \eta_\ell\,p_\ell(y; \boldsymbol{\vartheta}_\ell)$$`
+where `\(\pmb{\vartheta}\)` refers to `\(\pmb{\theta}\)` or `\(\pmb{\alpha}\)` under
+ZANIM and ZANIDM, respectively
+
+--
+
+- _However_, both distributions have only `\(2d\)` parameters: `\(\boldsymbol{\theta}\)` or `\(\boldsymbol{\alpha}\)`,
+and `\(\boldsymbol{\zeta}\)`.
+
+
+--
+
+- _And_ the mixture weights `\((\eta_\ell)\)` are functions of `\(\pmb{\zeta}\)`:
+.font80[
+.pull-left[
+- `\(\eta_d = \prod_{j=1}^d\,(1-\zeta_j)\)`
+- `\(\eta_0 = \prod_{j=1}^d\,\zeta_j\)`
+]
+.pull-right[
+- `\(\eta_N^{(j)} = (1 - \zeta_{j})\,\prod_{k \colon k \neq j} \zeta_{k}\)`, for `\(j = 1\ldots, d\)`.
+- Define
+`\(\mathfrak{K} = \{\mathcal{K} \subseteq \{1,\ldots,d\}; 1 \leq \lvert\mathcal{K}\rvert \leq d-2\}\)`,
+then for each `\(\mathcal{K} \in \mathfrak{K}\)`, we have
+`\(\eta_{\mathcal{K}} = \prod_{k \in \mathcal{K}} \zeta_k\,\prod_{j \notin \mathcal{K}} (1 - \zeta_j)\)`.
+]
+
+]
+
+---
+# ZANIM's p.m.f.
+
+`$$\begin{align}\Pr\lbrack
+\mathbf{Y} = \mathbf{y}; \pmb{\theta}, \pmb{\zeta}\rbrack &amp;= \eta_d\,\binom{N}{y_{1} \dots y_{d}}\,
+\prod_{j=1}^d
+\theta_j^{y_{j}} \leftarrow \fbox{Multinomial component}\\
+\fbox{All-inflation component}\rightarrow  &amp;\phantom{=}~+\eta_0\,\prod_{j=1}^{d}\,I_0(y_j)\\
+\fbox{N-inflation components}\rightarrow &amp;\phantom{=}~+
+\sum_{j=1}^{d}\,
+\eta_{N}^{(j)}
+\left\lbrack
+I_0\left(\sum_{k\colon k \neq j} y_{k} \right)\,
+\right\rbrack \\
+\fbox{Reduced multinomials}\rightarrow
+&amp;\phantom{=}~+
+\sum_{\mathcal{K} \in \mathfrak{K}}
+\eta_{\mathcal{K}}
+\left\lbrack
+I_0\left(\sum_{k \in \mathcal{K}} y_k\right)
+\binom{N}{\{y_j\}_{j \notin \mathcal{K}}}
+\prod_{j \notin \mathcal{K}} \left( \theta_j^{\mathcal{K}} \right)^{y_j}
+\right\rbrack  
+\quad \mathrm{for} \quad \mathbf{y} \in \pmb{\Omega}_{d,N} \cup \mathbf{0}_d,\end{align}$$`
+where
+`\(\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\theta_{\ell}}\)`.
+
+&gt; We do not need to evaluate ALL `\(2^d\)` mixture components.
+
+---
+### Marginal p.m.f. `\(\pmb{\theta} = (0.05, 0.70, 0.25), \pmb{\zeta} = (0.05, 0.15, 0.10)\)`, and `\(N=30\)`
+
+&lt;img src="index_files/figure-html/marginal-pmf-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+&lt;table class=" lightable-classic" style="font-size: 14px; font-family: Palatino; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Theoretical moments.&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Distribution &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; j &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; `\(\mathbb{E}\lbrack Y_j\rbrack\)` &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; `\(\mathrm{Var}\lbrack Y_j \rbrack\)` &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; `\(\mathrm{DI}\lbrack Y_j \rbrack\)` &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; `\(\mathrm{ZI}\lbrack Y_j \rbrack\)` &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ZANIM &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.010 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.669 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.312 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.333 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Multinomial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.425 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.950 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.026 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ZANIM &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.245 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.998 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.617 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.896 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Multinomial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.300 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.300 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.720 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ZANIM &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.722 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49.471 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.089 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.692 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Multinomial &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.625 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.750 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.151 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# Stochastic representation
+
+If `\(\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N, \boldsymbol{\theta}, \boldsymbol{\zeta} \rbrack\)`,
+then `\(\mathbf{Y}\)` has the stochastic representation:
+`$$\begin{align*}
+(z_j \mid \zeta_{j}) &amp;\sim \operatorname{Bernoulli}\lbrack 1 - \zeta_j \rbrack, \quad j=1,\ldots, d\\
+(\mathbf{Y} \mid N, \boldsymbol{\theta}, \boldsymbol{z}) &amp;\sim
+\begin{cases} \delta_{\mathbf{0}_d}(\cdot) &amp; \textrm{if} \: z_{j} = 0 \: \forall j\\
+\operatorname{Multinomial}_d\left\lbrack N, z_1\dfrac{\theta_1}{1 - s}, \ldots, z_d\dfrac{\theta_d}{1 - s}\right\rbrack
+&amp; \textrm{otherwise},
+\end{cases}
+\end{align*}$$`
+where `\(s=\sum_{k=1}^d (1 - z_k)\theta_k\)`.
+
+
+--
+If `\(\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N, \boldsymbol{\alpha}, \boldsymbol{\zeta} \rbrack\)`,
+then `\(\mathbf{Y}\)` has the stochastic representation &lt;a name=cite-Koslovsky2023&gt;&lt;/a&gt;([Koslovsky, 2023](#bib-Koslovsky2023)):
+`$$\begin{align*}
+(z_{j} \mid \zeta_{j}) &amp; \sim \operatorname{Bernoulli}\lbrack 1 - \zeta_{j}\rbrack, \\
+(\lambda_{j} \mid z_{j}, \alpha_{j}) &amp;\sim (1 - z_{j})\,\delta_0(\cdot) + z_{j} \operatorname{Gamma}\lbrack \alpha_{j}, 1\rbrack, \quad j = 1,\ldots, d, \\
+(\mathbf{Y} \mid N, \boldsymbol{\lambda}, \boldsymbol{z}) &amp;\sim
+\begin{cases} \delta_{\mathbf{0}_d}(\cdot) &amp; \textrm{if} \: z_{j} = 0 \: \forall j\\
+\operatorname{Multinomial}_d\left\lbrack N, \frac{\lambda_{1}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}, \ldots, \frac{\lambda_{d}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}\right\rbrack
+&amp; \textrm{otherwise},
+\end{cases}\end{align*}$$`
+
+
+---
+# Menezes, Parnell, and Murphy (2025)
+
+.pull-left[
+&lt;img src="./figures/paper_arxiv.png" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="./figures/qrcode.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+# Extending ZANIM with non-parametric regression
+
+- We allow both sets of parameters `\(\boldsymbol{\theta}\)` and `\(\boldsymbol{\zeta}\)`
+to depend on covariates through a non-parametric sum of decision trees.
+
+--
+
+- Given a vector of observed covariates, `\(\mathbf{x}_i\)`, we assume that the random
+vector `\(\mathbf{Y}_{i}\)` is
+
+`$$\begin{align}(\mathbf{Y}_{i} \mid \mathbf{x}_i, \mathcal{T}^{\pmb{\theta}}, \mathcal{M}^{\pmb{\theta}},
+\mathcal{T}^{\pmb{\zeta}}, \mathcal{M}^{\pmb{\zeta}}) &amp;
+\sim \operatorname{ZANIM}\lbrack N_i; \pmb{\theta}_i, \pmb{\zeta}_i\rbrack\\
+h_1(\theta_{ij}) &amp;=
+\sum_{t=1}^{m_{\pmb{\theta}}} g(\mathbf{x}_i; \mathcal{T}^{(\theta_j)}_{t}, \mathcal{M}^{(\theta_j)}_{t}), \quad j = 1,\ldots, d,\\
+h_2(\zeta_{ij}) &amp;=
+\sum_{t=1}^{m_{\pmb{\zeta}}} g(\mathbf{x}_i; \mathcal{T}^{(\zeta_j)}_{t}, \mathcal{M}^{(\zeta_j)}_{t}),
+\quad j = 1,\ldots, d.\end{align}$$`
+
+where `\(h_1(\cdot)\)` and `\(h_2(\cdot)\)` are suitable link functions,
+`\(g(\mathbf{x}_i; \mathcal{T}, \mathcal{M}) = I(\mathbf{x}_i \in \mathcal{A}_{\ell})\,\mu_{\ell}\)`
+with `\(\mu_{\ell} \in \mathbb{R}\)` for `\(\ell = 1\ldots, b\)` terminal nodes of `\(\mathcal{T}\)`,
+and `\(\{A_{\ell}\}_{\ell=1}^b\)` is a partition of the covariate space `\(\mathcal{X}\)`.
+
+- Bayesian inference is performed via MCMC following
+&lt;a name=cite-Chipman2010&gt;&lt;/a&gt;&lt;a name=cite-Linero2020&gt;&lt;/a&gt;&lt;a name=cite-Murray2021&gt;&lt;/a&gt;([Chipman et al., 2010](#bib-Chipman2010); [Linero et al., 2020](#bib-Linero2020); [Murray, 2021](#bib-Murray2021)).
+
+---
+# Preliminary results
+
+
+&lt;img src="index_files/figure-html/ploting-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Final remarks
+
+- We introduced and characterised two parametric families of distributions to model
+zero-inflation in count-compositional data through a mixture approach.
+
+- We incorporated covariates in ZANIM's parameters through a non-parametric
+additive regression trees approach.
+
+--
+
+- Extend ZANIDM to also allow parameters to depend on covariates through non-parametric additive
+regression trees.
+
+- Consider other component distributions suitable for modelling count-compositional
+data, e.g., the Conway-Maxwell-multinomial distribution &lt;a name=cite-Kadane2018&gt;&lt;/a&gt;&lt;a name=cite-Morris2020&gt;&lt;/a&gt;([Kadane et al., 2018](#bib-Kadane2018); [Morris et al., 2020](#bib-Morris2020)).
+
+- Study theoretical aspects of identifiability.
+
+---
+# References
+
+.font80[
+&lt;a name=bib-Chipman2010&gt;&lt;/a&gt;[Chipman, H. A. et al.](#cite-Chipman2010)
+(2010). "BART: Bayesian additive regression trees". In: _The Annals of
+Applied Statistics_ 4.1, pp. 266-298.
+
+&lt;a name=bib-Haslett2006&gt;&lt;/a&gt;[Haslett, J. et al.](#cite-Haslett2006)
+(2006). "Bayesian palaeoclimate reconstruction". In: _Journal of the
+Royal Statistical Society. Series A (Statistics in Society)_ 169.3, pp.
+395-438.
+
+&lt;a name=bib-Ilvonen2016&gt;&lt;/a&gt;[Ilvonen, L. et al.](#cite-Ilvonen2016)
+(2016). "A Bayesian multinomial regression model for palaeoclimate
+reconstruction with time uncertainty". In: _Environmetrics_ 27, pp.
+409-422.
+
+&lt;a name=bib-Kadane2018&gt;&lt;/a&gt;[Kadane, J. B. et al.](#cite-Kadane2018)
+(2018). "Sums of possibly associated multivariate indicator functions:
+the Conway-Maxwell-multinomial distribution". In: _Brazilian Journal of
+Probability and Statistics_ 32.3, pp. 583-596.
+
+&lt;a name=bib-Koslovsky2023&gt;&lt;/a&gt;[Koslovsky, M. D.](#cite-Koslovsky2023)
+(2023). "A Bayesian zero-inflated Dirichlet-multinomial regression
+model for multivariate compositional count data". In: _Biometrics_
+79.4, pp. 3239-3251.
+
+&lt;a name=bib-Linero2020&gt;&lt;/a&gt;[Linero, A. R. et al.](#cite-Linero2020)
+(2020). "Semiparametric mixed-scale models using shared Bayesian
+forests". In: _Biometrics_ 76.1, pp. 131-144.
+
+&lt;a name=bib-Morris2020&gt;&lt;/a&gt;[Morris, D. S. et al.](#cite-Morris2020)
+(2020). "A Conway-Maxwell-multinomial distribution for flexible
+modeling of clustered categorical data". In: _Journal of Multivariate
+Analysis_ 179, p. 104651.
+
+&lt;a name=bib-Murray2021&gt;&lt;/a&gt;[Murray, J. S.](#cite-Murray2021) (2021).
+"Log-linear Bayesian additive regression trees for multinomial logistic
+and count regression models". In: _Journal of the American Statistical
+Association_ 116.534, pp. 756-769.
+
+&lt;a name=bib-Parnell2015&gt;&lt;/a&gt;[Parnell, A. C. et al.](#cite-Parnell2015)
+(2015). "Bayesian inference for palaeoclimate with time uncertainty and
+stochastic volatility". In: _Journal of the Royal Statistical Society.
+Series C (Applied Statistics)_ 64.1, pp. 115-138.
+]
+
+
+
+---
+class: middle, inverse
+# Thank you!
+
+.pull-left[.pull-down[
+
+&lt;a href="mailto:andrefelipemaringa@gmail.com"&gt;
+&lt;svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M440 6.5L24 246.4c-34.4 19.9-31.1 70.8 5.7 85.9L144 379.6V464c0 46.4 59.2 65.5 86.6 28.6l43.8-59.1 111.9 46.2c5.9 2.4 12.1 3.6 18.3 3.6 8.2 0 16.3-2.1 23.6-6.2 12.8-7.2 21.6-20 23.9-34.5l59.4-387.2c6.1-40.1-36.9-68.8-71.5-48.9zM192 464v-64.6l36.6 15.1L192 464zm212.6-28.7l-153.8-63.5L391 169.5c10.7-15.5-9.5-33.5-23.7-21.2L155.8 332.6 48 288 464 48l-59.4 387.3z"&gt;&lt;/path&gt;&lt;/svg&gt; andrefelipemaringa@gmail.com
+&lt;/a&gt;
+
+&lt;a href="https://andrmenezes.github.io/casi25"&gt;
+&lt;svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"&gt;&lt;/path&gt;&lt;/svg&gt; andrmenezes.github.io/casi25
+&lt;/a&gt;
+
+&lt;a href="http://github.com/AndrMenezes"&gt;
+&lt;svg viewBox="0 0 496 512" style="height:1em;position:relative;display:inline-block;top:.1em;" xmlns="http://www.w3.org/2000/svg"&gt;  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;&lt;/svg&gt; @AndrMenezes
+&lt;/a&gt;
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
+]]
+
+.pull-right[
+![Map](./figures/qrcode.svg)
+]
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "ratio": "16:9",
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
