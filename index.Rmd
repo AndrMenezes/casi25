@@ -523,7 +523,7 @@ based on pollen data `r Citep(bib, "Parnell2015")`.
 count: false
 # References
 
-.font65[
+.font60[
 ```{r bib, results='asis', echo=FALSE}
 RefManageR::PrintBibliography(bib, start = 1, end = 12)
 ```
