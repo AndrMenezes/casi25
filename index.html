@@ -51,7 +51,8 @@ class: center, middle, inverse, title-slide
 ---
 ## Motivating example
 
-- Paleoclimate modelling (pollen counts): [Haslett et al. (2006)](#bib-Haslett2006); [Salter-Townshend et al. (2012)](#bib-SalterTownshend2012); [Parnell et al. (2015)](#bib-Parnell2015); [Ilvonen et al. (2016)](#bib-Ilvonen2016); [Tipton et al. (2019)](#bib-Tipton2019): 3 covariates and `\(d=28\)` categories.
+- Paleoclimate modelling (pollen counts): &lt;a name=cite-Haslett2006&gt;&lt;/a&gt;&lt;a name=cite-SalterTownshend2012&gt;&lt;/a&gt;&lt;a name=cite-Parnell2015&gt;&lt;/a&gt;&lt;a name=cite-Ilvonen2016&gt;&lt;/a&gt;&lt;a name=cite-Tipton2019&gt;&lt;/a&gt;[Haslett et al. (2006)](#bib-Haslett2006); [Salter-Townshend et al. (2012)](#bib-SalterTownshend2012); [Parnell et al. (2015)](#bib-Parnell2015); [Ilvonen et al. (2016)](#bib-Ilvonen2016); [Tipton et al. (2019)](#bib-Tipton2019).
+&lt;!-- : 3 covariates and `\(d=28\)` categories. --&gt;
 
 
 ```
@@ -87,7 +88,7 @@ class: center, middle, inverse, title-slide
 
 
 ---
-# Multinomial data augmentation
+# Zero-&amp;-N-inflated Multinomial distribution
 
 - Let `\(\mathbf{Y} = (Y_{1}, \ldots, Y_{d})\)` be a count-compositional random vector,
 whose sum `\(\sum_{j=1}^{d} Y_j = N\)` is constrained by a (known) integer `\(N\)`.
@@ -102,19 +103,20 @@ whose sum `\(\sum_{j=1}^{d} Y_j = N\)` is constrained by a (known) integer `\(N\
 
 
 --
-- Reparameterise `\(\theta_j=\lambda_j/\sum_{k=1}^d \lambda_k\)` and introduce the latent variiable `\((\phi \mid \boldsymbol{\lambda}, \mathbf{y}) \sim \operatorname{Gamma}\lbrack N, \sum_{j=1}^d\lambda_j\rbrack\)`, such that the augmented joint p.m.f is
-
-`$$\Pr\lbrack\mathbf{Y}=\mathbf{y},\phi;\boldsymbol{\lambda}\rbrack=\dfrac{N!\phi^{N-1}}{\Gamma(N)}\prod_{j=1}^d\left\lbrack\dfrac{\lambda_j^{y_j}e^{-\lambda_j\phi}}{y_j!}\right\rbrack.$$`
+- Reparameterise `\(\theta_j=\lambda_j/\sum_{k=1}^d \lambda_k\)` and introduce the latent 
+variable `\((\phi \mid \boldsymbol{\lambda}, \mathbf{y}) \sim \operatorname{Gamma}\lbrack N, \sum_{j=1}^d\lambda_j\rbrack\)`,
+such that the joint density of `\(\mathbf{Y}\)` and `\(\phi\)` is &lt;a name=cite-Baker1994&gt;&lt;/a&gt;([Baker, 1994](#bib-Baker1994)):
+`$$p(\mathbf{y},\phi;\boldsymbol{\lambda})=\dfrac{N!\phi^{N-1}}{\Gamma(N)}\prod_{j=1}^d\left\lbrack\dfrac{\lambda_j^{y_j}e^{-\lambda_j\phi}}{y_j!}\right\rbrack.$$`
 
 --
-- We extend this to a zero-inflated Poisson form with a vector `\(\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)\)` of zero-inflation parameters for each category, such that `\(\zeta_j \in \lbrack 0, 1 \rbrack\)`, i.e.
-
-`$$\Pr\lbrack \mathbf{Y} = \mathbf{y}, \phi; \boldsymbol{\lambda}, \boldsymbol{\zeta} \rbrack =
+- We extend this to a zero-inflated Poisson form with a vector
+`\(\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)\)` of zero-inflation parameters
+for each category, such that `\(\zeta_j \in \lbrack 0, 1 \rbrack\)`, i.e.
+`$$p(\mathbf{y},\phi; \boldsymbol{\lambda}, \boldsymbol{\zeta}) =
 \dfrac{N!\,\phi^{N - 1}}{\Gamma(N)}\,\prod_{j=1}^d \left\lbrack
 \zeta_j\,I_0(y_{j}) + (1 - \zeta_j)\,\dfrac{\lambda_j^{y_{j}}\,e^{-\lambda_j\,\phi}}{y_{j}!}
 \right\rbrack$$`
-
-and then integrate out `\(\phi\)` to obtain the zero-and-N-inflated multinomial (ZANIM) distribution.
+and then integrate out `\(\phi\)` to obtain the zero-&amp;-N-inflated multinomial (ZANIM) distribution.
 
 &lt;!-- -- --&gt;
 &lt;!-- - Zero-&amp;-N-inflated Dirichlet-Multinomial (ZANIDM): `\(\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N,\boldsymbol{\alpha}, \boldsymbol{\zeta}\rbrack\)`, where `\(\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_d)\)`, such that `\(\alpha_j &gt; 0\)` are concentration parameters. --&gt;
@@ -187,8 +189,9 @@ where
 &gt; We do not need to evaluate ALL `\(2^d\)` mixture components and there are only `\(2d\)` parameters, as the mixture weights `\(\boldsymbol{\eta}\)` are simple functions of the `\(\boldsymbol{\zeta}\)` parameters.
 
 ---
-# Stochastic representation
+## Stochastic representation
 
+.font80[
 If `\(\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N, \boldsymbol{\theta}, \boldsymbol{\zeta} \rbrack\)`,
 then `\(\mathbf{Y}\)` has the stochastic representation:
 `$$\begin{align*}
@@ -199,12 +202,15 @@ then `\(\mathbf{Y}\)` has the stochastic representation:
 &amp; \textrm{otherwise},
 \end{cases}
 \end{align*}$$`
-where `\(s=\sum_{k=1}^d (1 - z_k)\theta_k\)`.
-
+where `\(s=\sum_{k=1}^d (1 - z_k)\theta_k\)`.]
 
 --
+
+.font80[
 If `\(\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N, \boldsymbol{\alpha}, \boldsymbol{\zeta} \rbrack\)`,
-then `\(\mathbf{Y}\)` has the stochastic representation ([Koslovsky, 2023](#bib-Koslovsky2023)):
+then `\(\mathbf{Y}\)` has the stochastic representation &lt;a name=cite-Koslovsky2023&gt;&lt;/a&gt;([Koslovsky, 2023](#bib-Koslovsky2023)):]
+
+.font80[
 `$$\begin{align*}
 (z_{j} \mid \zeta_{j}) &amp; \sim \operatorname{Bernoulli}\lbrack 1 - \zeta_{j}\rbrack, \\
 (\lambda_{j} \mid z_{j}, \alpha_{j}) &amp;\sim (1 - z_{j})\,\delta_0(\cdot) + z_{j} \operatorname{Gamma}\lbrack \alpha_{j}, 1\rbrack, \quad j = 1,\ldots, d, \\
@@ -213,9 +219,11 @@ then `\(\mathbf{Y}\)` has the stochastic representation ([Koslovsky, 2023](#bib-
 \operatorname{Multinomial}_d\left\lbrack N, \frac{\lambda_{1}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}, \ldots, \frac{\lambda_{d}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}\right\rbrack
 &amp; \textrm{otherwise}.
 \end{cases}\end{align*}$$`
+]
 
 --
-&gt; We show that ZANIDM also admits a finite mixture representation and we derive moments, marginals, and fully conjugate Bayesian inference schemes for both distributions.
+
+&gt; .font80[We show that ZANIDM also admits a finite mixture representation and we derive moments, marginals, and fully conjugate Bayesian inference schemes for both distributions.]
 
 ---
 ### Marginal p.m.f. `\(\pmb{\theta} = (0.05, 0.70, 0.25)\)`, `\(\pmb{\zeta} = (0.05, 0.15, 0.10)\)`, and `\(N=30\)`
@@ -363,10 +371,10 @@ then `\(\mathbf{Y}\)` has the stochastic representation ([Koslovsky, 2023](#bib-
 # Menezes, Parnell, and Murphy (2025)
 
 .pull-left[
-&lt;img src="./figures/paper_arxiv.png" width="1221" style="display: block; margin: auto;" /&gt;
+&lt;img src="./figures/paper_arxiv.png" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-&lt;img src="./figures/qrcode.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="./figures/qrcode_paper.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 
@@ -396,13 +404,13 @@ with `\(\mu_{\ell} \in \mathbb{R}\)` for `\(\ell = 1\ldots, b\)` terminal nodes 
 and `\(\{A_{\ell}\}_{\ell=1}^b\)` is a partition of the covariate space `\(\mathcal{X}\)`.
 
 - Bayesian inference is performed via MCMC following
-([Chipman et al., 2010](#bib-Chipman2010); [Linero et al., 2020](#bib-Linero2020); [Murray, 2021](#bib-Murray2021)).
+&lt;a name=cite-Chipman2010&gt;&lt;/a&gt;&lt;a name=cite-Linero2020&gt;&lt;/a&gt;&lt;a name=cite-Murray2021&gt;&lt;/a&gt;([Chipman et al., 2010](#bib-Chipman2010); [Linero et al., 2020](#bib-Linero2020); [Murray, 2021](#bib-Murray2021)).
 
 ---
 # Preliminary results
 
 
-&lt;img src="index_files/figure-html/ploting-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/plot-bart-results-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -420,49 +428,58 @@ additive regression trees approach.
 regression trees.
 
 - Consider other component distributions suitable for modelling count-compositional
-data, e.g., the Conway-Maxwell-multinomial distribution ([Kadane et al., 2018](#bib-Kadane2018); [Morris et al., 2020](#bib-Morris2020)).
+data, e.g., the Conway-Maxwell-multinomial distribution &lt;a name=cite-Kadane2018&gt;&lt;/a&gt;&lt;a name=cite-Morris2020&gt;&lt;/a&gt;([Kadane et al., 2018](#bib-Kadane2018); [Morris et al., 2020](#bib-Morris2020)).
 
-- Study theoretical aspects of identifiability.
+&lt;!-- - Study theoretical aspects of identifiability. --&gt;
+
+- Integrate the proposed models into the paleoclimate reconstruction framework 
+based on pollen data ([Parnell et al., 2015](#bib-Parnell2015)).
 
 ---
 count: false
 # References
 
 .font70[
+&lt;a name=bib-Baker1994&gt;&lt;/a&gt;[Baker, S. G.](#cite-Baker1994) (1994). "The
+Multinomial-Poisson Transformation". In: _Journal of the Royal
+Statistical Society. Series D (The Statistician)_ 43.4, pp. 495-504.
+
 &lt;a name=bib-Chipman2010&gt;&lt;/a&gt;[Chipman, H. A. et al.](#cite-Chipman2010)
 (2010). "BART: Bayesian additive regression trees". In: _The Annals of
 Applied Statistics_ 4.1, pp. 266-298.
 
-&lt;a name=bib-Haslett2006&gt;&lt;/a&gt;[Haslett, J. et al.](#cite-Haslett2006) (2006).
-"Bayesian palaeoclimate reconstruction". In: _Journal of the Royal
-Statistical Society. Series A (Statistics in Society)_ 169.3, pp. 395-438.
+&lt;a name=bib-Haslett2006&gt;&lt;/a&gt;[Haslett, J. et al.](#cite-Haslett2006)
+(2006). "Bayesian palaeoclimate reconstruction". In: _Journal of the
+Royal Statistical Society. Series A (Statistics in Society)_ 169.3, pp.
+395-438.
 
-&lt;a name=bib-Ilvonen2016&gt;&lt;/a&gt;[Ilvonen, L. et al.](#cite-Ilvonen2016) (2016).
-"A Bayesian multinomial regression model for palaeoclimate reconstruction
-with time uncertainty". In: _Environmetrics_ 27, pp. 409-422.
+&lt;a name=bib-Ilvonen2016&gt;&lt;/a&gt;[Ilvonen, L. et al.](#cite-Ilvonen2016)
+(2016). "A Bayesian multinomial regression model for palaeoclimate
+reconstruction with time uncertainty". In: _Environmetrics_ 27, pp.
+409-422.
 
-&lt;a name=bib-Kadane2018&gt;&lt;/a&gt;[Kadane, J. B. et al.](#cite-Kadane2018) (2018).
-"Sums of possibly associated multivariate indicator functions: the
-Conway-Maxwell-multinomial distribution". In: _Brazilian Journal of
+&lt;a name=bib-Kadane2018&gt;&lt;/a&gt;[Kadane, J. B. et al.](#cite-Kadane2018)
+(2018). "Sums of possibly associated multivariate indicator functions:
+the Conway-Maxwell-multinomial distribution". In: _Brazilian Journal of
 Probability and Statistics_ 32.3, pp. 583-596.
 
 &lt;a name=bib-Koslovsky2023&gt;&lt;/a&gt;[Koslovsky, M. D.](#cite-Koslovsky2023)
-(2023). "A Bayesian zero-inflated Dirichlet-multinomial regression model for
-multivariate compositional count data". In: _Biometrics_ 79.4, pp.
-3239-3251.
+(2023). "A Bayesian zero-inflated Dirichlet-multinomial regression
+model for multivariate compositional count data". In: _Biometrics_
+79.4, pp. 3239-3251.
 
-&lt;a name=bib-Linero2020&gt;&lt;/a&gt;[Linero, A. R. et al.](#cite-Linero2020) (2020).
-"Semiparametric mixed-scale models using shared Bayesian forests". In:
-_Biometrics_ 76.1, pp. 131-144.
+&lt;a name=bib-Linero2020&gt;&lt;/a&gt;[Linero, A. R. et al.](#cite-Linero2020)
+(2020). "Semiparametric mixed-scale models using shared Bayesian
+forests". In: _Biometrics_ 76.1, pp. 131-144.
 
-&lt;a name=bib-Morris2020&gt;&lt;/a&gt;[Morris, D. S. et al.](#cite-Morris2020) (2020).
-"A Conway-Maxwell-multinomial distribution for flexible modeling of
-clustered categorical data". In: _Journal of Multivariate Analysis_ 179, p.
-104651.
+&lt;a name=bib-Morris2020&gt;&lt;/a&gt;[Morris, D. S. et al.](#cite-Morris2020)
+(2020). "A Conway-Maxwell-multinomial distribution for flexible
+modeling of clustered categorical data". In: _Journal of Multivariate
+Analysis_ 179, p. 104651.
 
 &lt;a name=bib-Murray2021&gt;&lt;/a&gt;[Murray, J. S.](#cite-Murray2021) (2021).
-"Log-linear Bayesian additive regression trees for multinomial logistic and
-count regression models". In: _Journal of the American Statistical
+"Log-linear Bayesian additive regression trees for multinomial logistic
+and count regression models". In: _Journal of the American Statistical
 Association_ 116.534, pp. 756-769.
 
 &lt;a name=bib-Parnell2015&gt;&lt;/a&gt;[Parnell, A. C. et al.](#cite-Parnell2015)
@@ -472,13 +489,8 @@ Series C (Applied Statistics)_ 64.1, pp. 115-138.
 
 &lt;a name=bib-SalterTownshend2012&gt;&lt;/a&gt;[Salter-Townshend, M. et
 al.](#cite-SalterTownshend2012) (2012). "Fast inversion of a flexible
-regression model for multivariate pollen counts data". In: _Environmetrics_
-23, pp. 595-605.
-
-&lt;a name=bib-Tipton2019&gt;&lt;/a&gt;[Tipton, J. R. et al.](#cite-Tipton2019) (2019).
-"Predicting paleoclimate from compositional data using multivariate Gaussian
-process inverse prediction". In: _The Annals of Applied Statistics_ 13.4,
-pp. 2363-2388.
+regression model for multivariate pollen counts data". In:
+_Environmetrics_ 23, pp. 595-605.
 ]
 
 
@@ -506,7 +518,7 @@ class: middle, inverse
 ]]
 
 .pull-right[
-![Map](./figures/qrcode.svg)
+![Map](./figures/qrcode_paper.svg)
 ]
 
     </textarea>

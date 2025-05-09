@@ -9,6 +9,7 @@ output:
   xaringan::moon_reader:
     css: ["default", "./config/sydney.css", "./config/sydney-fonts.css"]
     self_contained: FALSE
+    mathjax: default
     nature:
       ratio: "16:9"
       highlightStyle: github
@@ -55,7 +56,8 @@ data_pollen$specie <- forcats::fct_relevel(data_pollen$specie, sp)
 ---
 ## Motivating example
 
-- Paleoclimate modelling (pollen counts): `r Citet(bib, c("Haslett2006", "SalterTownshend2012", "Parnell2015", "Ilvonen2016", "Tipton2019"))`: 3 covariates and $d=28$ categories.
+- Paleoclimate modelling (pollen counts): `r Citet(bib, c("Haslett2006", "SalterTownshend2012", "Parnell2015", "Ilvonen2016", "Tipton2019"))`.
+<!-- : 3 covariates and $d=28$ categories. -->
 
 ```{r glimpse}
 data_pollen |>
@@ -88,7 +90,7 @@ data_pollen |>
 
 
 ---
-# Multinomial data augmentation
+# Zero-&-N-inflated Multinomial distribution
 
 - Let $\mathbf{Y} = (Y_{1}, \ldots, Y_{d})$ be a count-compositional random vector,
 whose sum $\sum_{j=1}^{d} Y_j = N$ is constrained by a (known) integer $N$.
@@ -103,19 +105,20 @@ whose sum $\sum_{j=1}^{d} Y_j = N$ is constrained by a (known) integer $N$.
 
 
 --
-- Reparameterise $\theta_j=\lambda_j/\sum_{k=1}^d \lambda_k$ and introduce the latent variiable $(\phi \mid \boldsymbol{\lambda}, \mathbf{y}) \sim \operatorname{Gamma}\lbrack N, \sum_{j=1}^d\lambda_j\rbrack$, such that the augmented joint p.m.f is
-
-$$\Pr\lbrack\mathbf{Y}=\mathbf{y},\phi;\boldsymbol{\lambda}\rbrack=\dfrac{N!\phi^{N-1}}{\Gamma(N)}\prod_{j=1}^d\left\lbrack\dfrac{\lambda_j^{y_j}e^{-\lambda_j\phi}}{y_j!}\right\rbrack.$$
+- Reparameterise $\theta_j=\lambda_j/\sum_{k=1}^d \lambda_k$ and introduce the latent 
+variable $(\phi \mid \boldsymbol{\lambda}, \mathbf{y}) \sim \operatorname{Gamma}\lbrack N, \sum_{j=1}^d\lambda_j\rbrack$,
+such that the joint density of $\mathbf{Y}$ and $\phi$ is `r Citep(bib, "Baker1994")`:
+$$p(\mathbf{y},\phi;\boldsymbol{\lambda})=\dfrac{N!\phi^{N-1}}{\Gamma(N)}\prod_{j=1}^d\left\lbrack\dfrac{\lambda_j^{y_j}e^{-\lambda_j\phi}}{y_j!}\right\rbrack.$$
 
 --
-- We extend this to a zero-inflated Poisson form with a vector $\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)$ of zero-inflation parameters for each category, such that $\zeta_j \in \lbrack 0, 1 \rbrack$, i.e.
-
-$$\Pr\lbrack \mathbf{Y} = \mathbf{y}, \phi; \boldsymbol{\lambda}, \boldsymbol{\zeta} \rbrack =
+- We extend this to a zero-inflated Poisson form with a vector
+$\boldsymbol{\zeta} = (\zeta_1, \ldots, \zeta_d)$ of zero-inflation parameters
+for each category, such that $\zeta_j \in \lbrack 0, 1 \rbrack$, i.e.
+$$p(\mathbf{y},\phi; \boldsymbol{\lambda}, \boldsymbol{\zeta}) =
 \dfrac{N!\,\phi^{N - 1}}{\Gamma(N)}\,\prod_{j=1}^d \left\lbrack
 \zeta_j\,I_0(y_{j}) + (1 - \zeta_j)\,\dfrac{\lambda_j^{y_{j}}\,e^{-\lambda_j\,\phi}}{y_{j}!}
 \right\rbrack$$
-
-and then integrate out $\phi$ to obtain the zero-and-N-inflated multinomial (ZANIM) distribution.
+and then integrate out $\phi$ to obtain the zero-&-N-inflated multinomial (ZANIM) distribution.
 
 <!-- -- -->
 <!-- - Zero-&-N-inflated Dirichlet-Multinomial (ZANIDM): $\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N,\boldsymbol{\alpha}, \boldsymbol{\zeta}\rbrack$, where $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_d)$, such that $\alpha_j > 0$ are concentration parameters. -->
@@ -188,8 +191,9 @@ $\theta_j^{\mathcal{K}} = \dfrac{\theta_j}{1 - \sum_{\ell \in \mathcal{K}}\,\the
 > We do not need to evaluate ALL $2^d$ mixture components and there are only $2d$ parameters, as the mixture weights $\boldsymbol{\eta}$ are simple functions of the $\boldsymbol{\zeta}$ parameters.
 
 ---
-# Stochastic representation
+## Stochastic representation
 
+.font80[
 If $\mathbf{Y} \sim \operatorname{ZANIM}_d\lbrack N, \boldsymbol{\theta}, \boldsymbol{\zeta} \rbrack$,
 then $\mathbf{Y}$ has the stochastic representation:
 $$\begin{align*}
@@ -200,12 +204,15 @@ $$\begin{align*}
 & \textrm{otherwise},
 \end{cases}
 \end{align*}$$
-where $s=\sum_{k=1}^d (1 - z_k)\theta_k$.
-
+where $s=\sum_{k=1}^d (1 - z_k)\theta_k$.]
 
 --
+
+.font80[
 If $\mathbf{Y} \sim \operatorname{ZANIDM}_d\lbrack N, \boldsymbol{\alpha}, \boldsymbol{\zeta} \rbrack$,
-then $\mathbf{Y}$ has the stochastic representation `r Citep(bib, "Koslovsky2023")`:
+then $\mathbf{Y}$ has the stochastic representation `r Citep(bib, "Koslovsky2023")`:]
+
+.font80[
 $$\begin{align*}
 (z_{j} \mid \zeta_{j}) & \sim \operatorname{Bernoulli}\lbrack 1 - \zeta_{j}\rbrack, \\
 (\lambda_{j} \mid z_{j}, \alpha_{j}) &\sim (1 - z_{j})\,\delta_0(\cdot) + z_{j} \operatorname{Gamma}\lbrack \alpha_{j}, 1\rbrack, \quad j = 1,\ldots, d, \\
@@ -214,9 +221,11 @@ $$\begin{align*}
 \operatorname{Multinomial}_d\left\lbrack N, \frac{\lambda_{1}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}, \ldots, \frac{\lambda_{d}}{\sum_{\ell=1}^{d}\,\lambda_{\ell}}\right\rbrack
 & \textrm{otherwise}.
 \end{cases}\end{align*}$$
+]
 
 --
-> We show that ZANIDM also admits a finite mixture representation and we derive moments, marginals, and fully conjugate Bayesian inference schemes for both distributions.
+
+> .font80[We show that ZANIDM also admits a finite mixture representation and we derive moments, marginals, and fully conjugate Bayesian inference schemes for both distributions.]
 
 ---
 ### Marginal p.m.f. $\pmb{\theta} = (0.05, 0.70, 0.25)$, $\pmb{\zeta} = (0.05, 0.15, 0.10)$, and $N=30$
@@ -343,13 +352,13 @@ p1
 
 --
 
-```{r tab-moments}
+```{r tab-moments, results='asis'}
 tab <- teo_moments |>
   dplyr::filter(dist != "ZANIDM") |>
   dplyr::arrange(j) |>
   dplyr::select(-c(prob0, cat))
 colnames(tab) <- c(
-  "Distribution", "j", "$\\mathbb{E}\\lbrack Y_j\\rbrack$",
+  "Distribution", "j", '$\\mathbb{E}\\lbrack Y_j\\rbrack$',
   "$\\mathrm{Var}\\lbrack Y_j \\rbrack$", "$\\mathrm{DI}\\lbrack Y_j \\rbrack$",
   "$\\mathrm{ZI}\\lbrack Y_j \\rbrack$")
 tab |>
@@ -382,7 +391,8 @@ tab <- teo_moments |>
   dplyr::arrange(j) |> 
   dplyr::select(-c(prob0, cat))
 colnames(tab) <- c(
-  "Distribution", "j", "$\\mathbb{E}\\lbrack Y_j\\rbrack$",
+  "Distribution", "j", 
+  "$\\mathbb{E}\\lbrack Y_j\\rbrack$",
   "$\\mathrm{Var}\\lbrack Y_j \\rbrack$", "$\\mathrm{DI}\\lbrack Y_j \\rbrack$",
   "$\\mathrm{ZI}\\lbrack Y_j \\rbrack$")
 tab |> 
@@ -401,7 +411,7 @@ knitr::include_graphics("./figures/paper_arxiv.png")
 ]
 .pull-right[
 ```{r}
-knitr::include_graphics("./figures/qrcode.svg")
+knitr::include_graphics("./figures/qrcode_paper.svg")
 ```
 ]
 
@@ -438,7 +448,7 @@ and $\{A_{\ell}\}_{\ell=1}^b$ is a partition of the covariate space $\mathcal{X}
 # Preliminary results
 
 
-```{r ploting}
+```{r plot-bart-results}
 d_theta <- readRDS("./data/df_theta.rds")
 d_zeta <- readRDS("./data/df_zeta.rds")
 data_pollen <- read.csv("./data/rs11_pollen.csv")
@@ -501,7 +511,10 @@ regression trees.
 - Consider other component distributions suitable for modelling count-compositional
 data, e.g., the Conway-Maxwell-multinomial distribution `r Cite(bib, c("Kadane2018", "Morris2020"))`.
 
-- Study theoretical aspects of identifiability.
+<!-- - Study theoretical aspects of identifiability. -->
+
+- Integrate the proposed models into the paleoclimate reconstruction framework 
+based on pollen data `r Citep(bib, "Parnell2015")`.
 
 ---
 count: false
@@ -538,6 +551,6 @@ class: middle, inverse
 ]]
 
 .pull-right[
-![Map](./figures/qrcode.svg)
+![Map](./figures/qrcode_paper.svg)
 ]
 
