@@ -430,8 +430,8 @@ to depend on covariates through a non-parametric sum of decision trees.
 - Given a vector of observed covariates, $\mathbf{x}_i$, we assume that the random
 vector $\mathbf{Y}_{i}$ is
 
-$$\begin{align}(\mathbf{Y}_{i} \mid \mathbf{x}_i, \mathcal{T}^{\pmb{\theta}}, \mathcal{M}^{\pmb{\theta}},
-\mathcal{T}^{\pmb{\zeta}}, \mathcal{M}^{\pmb{\zeta}}) &
+$$\begin{align}(\mathbf{Y}_{i} \mid \mathbf{x}_i, \mathcal{T}^{(\pmb{\theta})}, \mathcal{M}^{(\pmb{\theta})},
+\mathcal{T}^{(\pmb{\zeta})}, \mathcal{M}^{(\pmb{\zeta})} ) &
 \sim \operatorname{ZANIM}\lbrack N_i; \pmb{\theta}_i, \pmb{\zeta}_i\rbrack\\
 h_1(\theta_{ij}) &=
 \sum_{t=1}^{m_{\pmb{\theta}}} g(\mathbf{x}_i; \mathcal{T}^{(\theta_j)}_{t}, \mathcal{M}^{(\theta_j)}_{t}), \quad j = 1,\ldots, d,\\
@@ -500,24 +500,28 @@ plot_grid(plotlist = list_plots, ncol = 1)
 ---
 # Final remarks
 
-- We introduced and characterised two parametric families of distributions to model
-zero-inflation in count-compositional data through a mixture approach.
+**Summary**
 
-- We incorporated covariates in ZANIM's parameters through a non-parametric
-additive regression trees approach.
+  - We introduced and characterised two parametric families of distributions to model
+  zero-inflation in count-compositional data through a mixture approach.
+  
+  - We incorporated covariates in ZANIM's parameters through a non-parametric
+  additive regression trees approach.
 
 --
 
-- Extend ZANIDM to also allow parameters to depend on covariates through non-parametric additive
-regression trees.
+**Future work**
 
-- Consider other component distributions suitable for modelling count-compositional
-data, e.g., the Conway-Maxwell-multinomial distribution `r Cite(bib, c("Kadane2018", "Morris2020"))`.
-
-<!-- - Study theoretical aspects of identifiability. -->
-
-- Integrate the proposed models into the paleoclimate reconstruction framework 
+  - Extend ZANIDM to also allow parameters to depend on covariates through non-parametric additive
+  regression trees.
+  
+  - Consider other component distributions suitable for modelling count-compositional
+  data, e.g., the Conway-Maxwell-multinomial distribution `r Cite(bib, c("Kadane2018", "Morris2020"))`.
+  
+  - Integrate the proposed models into the paleoclimate reconstruction framework 
 based on pollen data `r Citep(bib, "Parnell2015")`.
+
+
 
 ---
 count: false
